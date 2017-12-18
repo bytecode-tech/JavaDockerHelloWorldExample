@@ -1,0 +1,5 @@
+- name: Create docker image
+  hosts: localhost
+
+  roles:
+    - dockersampleapp

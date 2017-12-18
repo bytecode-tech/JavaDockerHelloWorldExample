@@ -1,0 +1,49 @@
+---
+# tasks to deploy the hello world app
+- name: Build sample application
+  shell: mvn package
+  args:
+    chdir: app-source/
+
+- name: Create artifacts directory needed to build image
+  file:
+    dest: "{{ docker_build_dir }}/{{ docker_image_name }}/artifacts/{{ item }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - conf
+    - lib
+    - webapps
+
+- name: Download postgres from maven
+  maven_artifact:
+    group_id: org.postgresql
+    artifact_id: postgresql
+    extension: "jar"
+    dest: "{{ docker_build_dir }}/{{ docker_image_name }}/artifacts/lib"
+
+- name: Copy webapp to docker build dir
+  copy:
+    src: "{{ war_file_url }}"
+    dest: "{{ docker_build_dir }}/{{ docker_image_name }}/artifacts/webapps/"
+    mode: 0644
+
+- name: Install Dockerfile to build dir
+  template:
+    src: Dockerfile.j2
+    dest: "{{ docker_build_dir }}/{{ docker_image_name }}/Dockerfile"
+    mode: 0755
+
+- name: Build image and with buildargs
+  docker_image:
+     name: "{{ docker_image_name }}"
+     state: present
+     force: yes
+     path: "{{ docker_build_dir }}/{{ docker_image_name }}"
+     buildargs:
+       tomcat_container_version: "{{ tomcat_container_version }}"
+
+- name: Delete docker build dir
+  file:
+    dest: "{{ docker_build_dir }}/{{ docker_image_name }}"
+    state: absent

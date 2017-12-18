@@ -1,0 +1,9 @@
+---
+# defaults file for sampleapp
+tomcat_container_version: tomcat:8.5-jre8-alpine
+
+docker_build_dir: /tmp/docker
+docker_image_name: java-docker-hello-world-example
+
+war_file_url: "{{ playbook_dir }}/app-source/target/JavaDockerHelloWorldExample.war"
+

@@ -1,0 +1,9 @@
+ARG tomcat_container_version
+FROM {{ tomcat_container_version }}
+
+# Remove default webapps from container
+RUN rm -rf /usr/local/tomcat/webapps/*
+
+# Copy all artifacts needed for application
+# NOTE:  must be in the directory structure needed by tomcat
+COPY ./artifacts/ /usr/local/tomcat/
